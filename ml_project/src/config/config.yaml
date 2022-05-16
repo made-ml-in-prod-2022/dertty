@@ -1,0 +1,19 @@
+defaults:
+  - _self_
+  - model: logreg
+
+random_state: 0
+
+processed_folder: "data/processed"
+result_folder: "data/processed"
+raw_folder: "data/raw"
+filename: "data/raw/heart_cleveland_upload.csv"
+split: 1
+
+test_size: 0.3
+valid_size: 0.3
+cat_cols: ['sex', 'cp', 'fbs', 'restecg', 'exang', 'ca', 'thal']
+num_cols: ['age', 'trestbps', 'chol', 'thalach','oldpeak', 'slope']
+target_col: 'condition'
+model_path_to_save: 'models/'
+
