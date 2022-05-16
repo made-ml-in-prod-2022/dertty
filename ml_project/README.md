@@ -12,7 +12,7 @@ make train
 ```
 To run predict pipeline including requirements installation and preprocessing on default dataset use:
 ```commandline
-make predict
+make predict model=logreg filename=data/raw/heart_cleveland_upload.csv result_folder=data/results/heart_cleveland_upload.csv
 ```
 To run train pipeline use another configs use:
 ```commandline
