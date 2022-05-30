@@ -11,6 +11,9 @@ install = "*"
 hydra-core = "*"
 pytest = "*"
 faker = "*"
+fastapi = "*"
+uvicorn = "*"
+boto3 = "*"
 
 [dev-packages]
 cookiecutter = "*"
