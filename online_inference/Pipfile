@@ -4,21 +4,19 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-jupyter = "*"
-python-dotenv = "*"
-scikit-learn = "*"
-install = "*"
-hydra-core = "*"
-pytest = "*"
-faker = "*"
 fastapi = "*"
-uvicorn = "*"
+uvicorn = {extras = ["standard"], version = "*"}
 boto3 = "*"
+numpy = "*"
+pandas = "*"
+scikit-learn = "*"
+joblib = "*"
+pytest = "*"
 starlette = "*"
+starlette-api = "*"
+requests = "*"
 
 [dev-packages]
-cookiecutter = "*"
-pandas-profiling = "*"
 
 [requires]
 python_version = "3.9"
