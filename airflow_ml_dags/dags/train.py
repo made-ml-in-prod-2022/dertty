@@ -67,10 +67,10 @@ def fit_model(processed_file_location, model_file_location, ti):
     dump(clf, model_file_location + 'model.joblib')
 
 
-def evaluate_model(processed_file_location, model_file_location, ti):
+def evaluate_model(raw_file_location, model_file_location, ti):
     clf = load(model_file_location + 'model.joblib')
-    X_test = pd.read_csv(processed_file_location + 'data_test.csv')
-    y_test = pd.read_csv(processed_file_location + 'target_test.csv').iloc[:, 0].values
+    X_test = pd.read_csv(raw_file_location + 'data_test.csv')
+    y_test = pd.read_csv(raw_file_location + 'target_test.csv').iloc[:, 0].values
 
     score = roc_auc_score(y_test, clf.predict_proba(X_test)[:, 1]).iloc[:, 0].values
     ti.xcom_push(key='model_perfomance', value=score)
