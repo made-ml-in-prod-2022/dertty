@@ -16,7 +16,6 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import roc_auc_score
 
-
 logger = logging.getLogger("airflow.task")
 
 
@@ -39,7 +38,6 @@ def data_prepocessing(raw_file_location, processed_file_location):
 
 
 def tune_model(processed_file_location, ti):
-
     X_train = pd.read_csv(processed_file_location + 'data_train.csv')
     y_train = pd.read_csv(processed_file_location + 'target_train.csv').iloc[:, 0].values
 
@@ -62,23 +60,23 @@ def tune_model(processed_file_location, ti):
 def fit_model(processed_file_location, model_file_location, ti):
     X_train = pd.read_csv(processed_file_location + 'data_train.csv')
     y_train = pd.read_csv(processed_file_location + 'target_train.csv').iloc[:, 0].values
-    clf = RandomForestClassifier(max_depth=ti.xcom_pull(key="max_depth") , n_estimators=50)
+    clf = RandomForestClassifier(max_depth=ti.xcom_pull(key="max_depth"), n_estimators=50)
     clf.fit(X_train, y_train)
     dump(clf, model_file_location + 'model.joblib')
 
 
-def evaluate_model(raw_file_location, model_file_location, ti):
+def evaluate_model(processed_file_location, model_file_location, ti):
     clf = load(model_file_location + 'model.joblib')
-    X_test = pd.read_csv(raw_file_location + 'data_test.csv')
-    y_test = pd.read_csv(raw_file_location + 'target_test.csv').iloc[:, 0].values
+    X_test = pd.read_csv(processed_file_location + 'data_test.csv')
+    y_test = pd.read_csv(processed_file_location + 'target_test.csv').iloc[:, 0].values
 
-    score = roc_auc_score(y_test, clf.predict_proba(X_test)[:, 1]).iloc[:, 0].values
+    score = roc_auc_score(y_test, clf.predict_proba(X_test)[:, 1])
     ti.xcom_push(key='model_perfomance', value=score)
 
 
 with DAG(
         'get_model',
-        schedule_interval='@daily',
+        schedule_interval='@weekly',
         catchup=False,
         max_active_runs=1,
         default_args={
@@ -89,17 +87,16 @@ with DAG(
             'retry_delay': timedelta(seconds=15)
         }
 ) as dag:
-
     processed_mkdir = BashOperator(
-        task_id = 'processed_mkdir',
-        bash_command = 'mkdir -p /opt/airflow/data/processed/{{ ds }}',
-        dag = dag,
+        task_id='processed_mkdir',
+        bash_command='mkdir -p /opt/airflow/data/processed/{{ ds }}',
+        dag=dag,
     )
 
     models_mkdir = BashOperator(
-        task_id = 'models_mkdir',
-        bash_command = 'mkdir -p /opt/airflow/data/models/{{ ds }}',
-        dag = dag,
+        task_id='models_mkdir',
+        bash_command='mkdir -p /opt/airflow/data/models/{{ ds }}',
+        dag=dag,
     )
 
     data_prepocessing_task = PythonOperator(
@@ -136,9 +133,9 @@ with DAG(
         python_callable=evaluate_model,
         dag=dag,
         op_kwargs={
-            'raw_file_location': '/opt/airflow/data/raw/{{ ds }}/',
+            'processed_file_location': '/opt/airflow/data/processed/{{ ds }}/',
             'model_file_location': '/opt/airflow/data/models/{{ ds }}/',
         },
     )
 
-    processed_mkdir >> models_mkdir>> data_prepocessing_task >> tune_model_task >> fit_model_task >> evaluate_model_task
+    processed_mkdir >> models_mkdir >> data_prepocessing_task >> tune_model_task >> fit_model_task >> evaluate_model_task

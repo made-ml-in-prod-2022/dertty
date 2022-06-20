@@ -9,6 +9,7 @@ import logging
 
 import numpy as np
 import pandas as pd
+from joblib import dump, load
 
 from sklearn.ensemble import RandomForestClassifier
 
@@ -16,15 +17,15 @@ from sklearn.ensemble import RandomForestClassifier
 logger = logging.getLogger("airflow.task")
 
 
-def predict(predictions_file_location):
+def predict(raw_file_location, predictions_file_location):
     model_path = Variable.get("model_path")
     clf = load(model_path)
     X = pd.read_csv(raw_file_location + 'data.csv')
-    clf.predict(X).to_csv(predictions_file_location + 'predictions.csv', index=False)
+    pd.DataFrame(clf.predict(X)).to_csv(predictions_file_location + 'predictions.csv', index=False)
 
 
 with DAG(
-        'data_preparation',
+        'inference',
         schedule_interval='@daily',
         catchup=False,
         max_active_runs=1,
@@ -47,7 +48,10 @@ with DAG(
         task_id='predict',
         python_callable=predict,
         dag=dag,
-        op_kwargs={'predictions_file_location': '/opt/airflow/data/predictions/{{ ds }}/'},
+        op_kwargs={
+            'raw_file_location': '/opt/airflow/data/raw/{{ ds }}/',
+            'predictions_file_location': '/opt/airflow/data/predictions/{{ ds }}/',
+        },
     )
 
     predictions_mkdir >> predict_task

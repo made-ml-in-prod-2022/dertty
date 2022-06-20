@@ -22,7 +22,7 @@ def generate_xy(raw_file_location):
 
     pd.DataFrame(X).to_csv(raw_file_location + 'data.csv', index=False)
     pd.DataFrame(y).to_csv(raw_file_location + 'target.csv', index=False)
-    LoggingMixin().log.info(f"Samples are stored in {file_location}")
+    LoggingMixin().log.info(f"Samples are stored in {raw_file_location}")
 
 
 with DAG(
