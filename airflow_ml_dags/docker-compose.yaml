@@ -275,6 +275,18 @@ services:
       airflow-init:
         condition: service_completed_successfully
 
+  py-data:
+    build:
+      context: dags/by_docker_operators/docker_tasks/data_image
+    image: data_image
+    restart: "no"
+
+  py-ml:
+    build:
+      context: dags/by_docker_operators/docker_tasks/model_image
+    image: model_image
+    restart: "no"
+
 #  docker-proxy:
 #    image: bobrik/socat
 #    command: "TCP4-LISTEN:2375,fork,reuseaddr UNIX-CONNECT:/var/run/docker.sock"

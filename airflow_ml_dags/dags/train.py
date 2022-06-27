@@ -2,12 +2,10 @@ from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
 from airflow.operators.bash_operator import BashOperator
 from airflow.utils.log.logging_mixin import LoggingMixin
-from airflow.models import Variable
 
 from datetime import datetime, timedelta
 import logging
 
-import numpy as np
 import pandas as pd
 from joblib import dump, load
 
