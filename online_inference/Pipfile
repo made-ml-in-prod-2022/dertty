@@ -1,0 +1,22 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+fastapi = "*"
+uvicorn = {extras = ["standard"], version = "*"}
+boto3 = "*"
+numpy = "*"
+pandas = "*"
+scikit-learn = "*"
+joblib = "*"
+pytest = "*"
+starlette = "*"
+starlette-api = "*"
+requests = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.9"
