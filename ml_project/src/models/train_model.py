@@ -11,6 +11,11 @@ from sklearn.linear_model import LogisticRegressionCV
 from joblib import dump
 from transformers import *
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import roc_auc_score
+import warnings
+
+
+warnings.filterwarnings("ignore", category=FutureWarning)
 
 
 @hydra.main(config_path="../config", config_name="config.yaml")
@@ -33,12 +38,20 @@ def main(cfg: DictConfig):
             ('preproc', union),
             ('model', model)])
 
-    df = pd.read_csv(Path(hydra.utils.get_original_cwd(), cfg.filename))
-    X = df[cfg.cat_cols + cfg.num_cols]
-    y = df[cfg.target_col]
+    df_train = pd.read_csv(Path(hydra.utils.get_original_cwd(), cfg.processed_folder, Path(cfg.filename).stem + '_train.csv'))
+    df_test = pd.read_csv(Path(hydra.utils.get_original_cwd(), cfg.processed_folder, Path(cfg.filename).stem + '_test.csv'))
+    X = df_train[cfg.cat_cols + cfg.num_cols]
+    y = df_train[cfg.target_col].values
     pipe.fit(X, y)
     dump(pipe, Path(hydra.utils.get_original_cwd(), cfg.model_path_to_save, cfg.model.name))
-    logger.info(f'mdoel file have been saved to {Path(hydra.utils.get_original_cwd(), cfg.model_path_to_save, cfg.model.name)}')
+    X_test = df_test[cfg.cat_cols + cfg.num_cols]
+    y_test = df_test[cfg.target_col].values
+    roc_auc_score
+    logger.info(
+        f'Train model score {roc_auc_score(y, pipe.predict(X))}')
+    logger.info(
+        f'Test model score {roc_auc_score(y_test, pipe.predict(X_test))}')
+    logger.info(f'model file have been saved to {Path(hydra.utils.get_original_cwd(), cfg.model_path_to_save, cfg.model.name)}')
 
 
 if __name__ == '__main__':
