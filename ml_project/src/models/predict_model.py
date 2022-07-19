@@ -20,7 +20,7 @@ def main(cfg: DictConfig):
     df = pd.read_csv(Path(hydra.utils.get_original_cwd(), cfg.processed_folder, Path(cfg.filename).name))
     X = df[cfg.cat_cols + cfg.num_cols]
     X['predict'] = pipe.predict_proba(X)[:, 1]
-    print()
+    
     if Path(cfg.result_folder).name[-3:] == 'csv':
         X.to_csv(Path(hydra.utils.get_original_cwd(), cfg.result_folder), index=False)
         logger.info(
